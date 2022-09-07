@@ -6,7 +6,7 @@ public class App extends PApplet{
     public static PApplet ctx;
     public float[] wave;
     public float[] transform;
-    public float lambda = 21; //wavelength in pixels
+    public float lambda = 18; //wavelength in pixels
     int IX(int x, int y) {x = constrain(x, 0, N-1); y = constrain(y, 0, N-1); return x + (y * N);}
     int x, y;
 
@@ -20,7 +20,7 @@ public class App extends PApplet{
         wave = new float[N*N];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                wave[IX(i, j)] = -(float)(255/2) * (float)Math.sin((double)i / lambda * (3.141592654 * 2)) + (255/2);
+                wave[IX(i, j)] = (float)(255/2) * (float)Math.cos((double)i / lambda * (Constants.pi * 2)) + (255/2);
             }
         }
     //     F(u,v) = SUM{ f(x,y)*exp(-j*2*pi*(u*x+v*y)/N) }
@@ -60,17 +60,22 @@ public class App extends PApplet{
         }
     }
     public void render_transform() {
+        float[] all_values = new float[N * N];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 float x = i * GRID;
                 float y = (j + N) * GRID; //offset
-                Complex d = F(i - (N/2), j-(N/2));
-                System.out.println(d.magnitude());
-                fill(d.magnitude());
+                Complex d = F(i - (N/2), j-(N/2)); 
+                all_values[IX(i,j)] = d.magnitude() * 255;
+                //D_f = [0, 1]
+                // System.out.println(d.magnitude());
+                fill(d.magnitude() * 255);
                 noStroke();
                 square(x, y, GRID);
             }
         }
+        float m = max(all_values);
+        System.out.println(m);
     }
     Complex F(int u, int v){
         //2D forier transform
@@ -78,7 +83,10 @@ public class App extends PApplet{
         float i = 0;
         for (int x = 0; x < N; x++){
             for (int y = 0; y < N; y++){
-                Complex c = new Complex((float)0, (float)-2*Constants.pi*((u*x)+(v*y))).exp().multiply(wave[IX(x,y)]).devide(N);
+                Complex c = new Complex((float)0, (float)-2*Constants.pi*((u*x)+(v*y)))
+                .devide(N)
+                .exp()
+                .multiply((wave[IX(x,y)] - (float)(255/2))/(255/2));
                 r += c.real;
                 i += c.imaginary;
             }

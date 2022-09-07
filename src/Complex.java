@@ -24,7 +24,7 @@ public class Complex{
     Complex devide(Complex other){
         // (a + bi) / (c + di) = (a + bi)(c - di) / (c^2 + d^2)
         return this.multiply(other.conjugate()).devide(
-                new Complex(other.real * other.real, other.imaginary * other.imaginary));
+                (other.real * other.real) + (other.imaginary * other.imaginary));
     }
     Complex devide(int c){
         // (a + bi) / c = (a/c) + (b/c)i
